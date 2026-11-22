@@ -1,19 +1,62 @@
+#!/usr/bin/env python
 import torch,sys
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from huggingface_hub import scan_cache_dir
 
+def human_size(size):
+    for unit in ("B", "KB", "MB", "GB", "TB"):
+        if size < 1024:
+            return f"{size:.1f} {unit}"
+        size /= 1024
+    return f"{size:.1f} PB"
+
+def choose_model():
+    # Analyse le cache Hugging Face
+    cache = scan_cache_dir()
+    # Ne conserver que les dépôts de modèles
+    repos = [
+        repo for repo in cache.repos
+        if repo.repo_type == "model"
+    ]
+    repos.sort(key=lambda r: r.repo_id.lower())
+    if not repos:
+        print("Aucun modèle trouvé.")
+        return None
+    print("\nModèles disponibles :\n")
+    for i, repo in enumerate(repos, 1):
+        print(
+            f"{i:2d} - {repo.repo_id:<55} "
+            f"{human_size(repo.size_on_disk)}"
+        )
+    print("\n 0 - Quitter")
+    while True:
+        try:
+            choice = int(input("\nVotre choix : "))
+            if choice == 0:
+                return None
+            if 1 <= choice <= len(repos):
+                selected = repos[choice - 1]
+                print(f"\nModèle sélectionné : {selected.repo_id}")
+                return selected.repo_id
+            print("Choix invalide.")
+        except ValueError:
+            print("Veuillez saisir un numéro.")
+# FIN def choose_model()
+
+######################################################################################
+#                                EN AVANT SIMONE                                     #
+######################################################################################
 # ----------------------------------------
 # 1. Chargement du modèle
 # ----------------------------------------
-
-MODEL_PATH = "/home/dauriac/travauxInformatiques/IA/hf/SmolLM-135M"
-
+MODEL_PATH = choose_model()
+if MODEL_PATH==None:
+    sys.exit(1)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH,
     dtype=torch.float32
 )
-
 model.eval()
 
 # ----------------------------------------
