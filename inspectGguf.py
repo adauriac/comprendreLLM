@@ -20,17 +20,20 @@ tokens = reader.fields["tokenizer.ggml.tokens"].contents()
 V = len(tokens)
 print("Taille vocabulaire :", V)
 while True:
-    res=input(f"To see tokens between begin end (<{V}). Enter begin et end (if error stop showing tokens)")
+    res=input(f"To see tokens between begin end (<{V}). Enter begin et end (empty->no)")
     try:
         b,e=map(int,res.split())
         for i, token in enumerate(tokens[b:e+1]):
             print(i, token)
     except:
         break
-q = input("Type a question to see its decomposition in tokens (empty->no) ")
-llm = Llama(model_path=filename, vocab_only=True, verbose=False)
-ids = llm.tokenize(question.encode("utf-8"), add_bos=False, special=False)
-sys.exit(123)
+while True:
+    question = input("Type a question to see its decomposition in tokens (empty->no) ")
+    if question == '':
+        break
+    llm = Llama(model_path=filename, vocab_only=True, verbose=False)
+    ids = llm.tokenize(question.encode("utf-8"), add_bos=False, special=False)
+    print(list(map(lambda x:tokens[x],ids)))
 
 print("Nombre de tenseurs :", len(reader.tensors))
 for t in reader.tensors:
@@ -40,4 +43,4 @@ for t in reader.tensors:
           f"{t.n_elements:12,d} "
           f"{t.tensor_type.name:10s} "
           f"{t.n_bytes:12,d} octets")
-    input("hit return")
+    input("hit return for the next one")
