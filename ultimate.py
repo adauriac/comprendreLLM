@@ -62,7 +62,6 @@ model.eval()
 # ----------------------------------------
 # 2. Question et paramètres
 # ----------------------------------------
-
 question = "Qu'est-ce qu'un Transformer ?"
 messages = [
     {"role": "user", "content": question}
@@ -103,6 +102,7 @@ def interroger():
 print("\n===== MODELE ORIGINAL =====")
 reponse_1 = interroger()
 print(f"{reponse_1=}")
+input("Hit return to continue. Weights are going to be modified")
 
 # ----------------------------------------
 # 5. Modification d'un poids
@@ -126,21 +126,15 @@ print("Nouvelle valeur :", W[i, j].item())
 # ----------------------------------------
 # 6. Deuxième expérience
 # ----------------------------------------
-
 print("\n===== MODELE MODIFIE =====")
-
 reponse_2 = interroger()
-
 print(reponse_2)
 
 # ----------------------------------------
 # 7. Comparaison
 # ----------------------------------------
-
 print("\n===== COMPARAISON =====")
-
 print("\nRéponse originale :")
 print(reponse_1)
-
 print("\nRéponse modifiée :")
 print(reponse_2)
